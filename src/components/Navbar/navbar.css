@@ -1,14 +1,35 @@
 .navbar {
     align-items: center;
-    background-color: #000;
-    color: #fff;
+    background-color: #f0f0f0;
+    /* Fundo cinza claro */
+    color: #333;
+    /* Texto escuro */
     display: flex;
-    font-size: 16px;
+    font-size: 18px;
+    /* Fonte um pouco maior */
     justify-content: space-between;
-    padding: 20px 40px;
+    padding: 12px 24px;
+    /* Padding ajustado */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Sombra leve */
+    height: 65px;
 }
 
 .navbar .close {
-    background-color: transparent;
+    background-color: #333;
+    /* Fundo escuro para o botão */
+    color: #fff;
+    /* Texto branco */
     border: none;
+    border-radius: 50%;
+    /* Botão circular */
+    width: 30px;
+    height: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.navbar .close:hover {
+    background-color: #000;
 }

@@ -1,49 +1,16 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://ripe-donella-atitus-fbbf314a.koyeb.app/ws/point';
-
-
+// Usar uma variável de ambiente para o URL base da API
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ripe-donella-atitus-fbbf314a.koyeb.app';
+const API_POINT_URL = `${BASE_URL}/ws/point`; // Endpoint de pontos
 
 export async function getPoints(token) {
   try {
-    const response = await axios.get(BASE_URL, {
+    const response = await axios.get(API_POINT_URL, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    // Mocked response
-    /*
-    const response = {
-      status: 200,
-      data: [
-      {
-        id: 1,
-        descricao: 'Avenida Paulista',
-        latitude: -23.561684,
-        longitude: -46.656139,
-      },
-      {
-        id: 2,
-        descricao: 'Parque Ibirapuera',
-        latitude: -23.587416,
-        longitude: -46.657634,
-      },
-      {
-        id: 3,
-        descricao: 'Mercadão Municipal',
-        latitude: -23.541212,
-        longitude: -46.627684,
-      },
-      {
-        id: 4,
-        descricao: 'Estação da Luz',
-        latitude: -23.536578,
-        longitude: -46.633309,
-      },
-      ],
-    };
-    */
 
     // o objeto response.data possui os campos latitude e longitude mas precisamos mudar os nomes para lat lng
     const points = response.data.map(point => ({
@@ -67,22 +34,12 @@ export async function getPoints(token) {
 
 export async function postPoint(token, pointData) {
   try {
-    const response = await axios.post(BASE_URL, pointData, {
+    const response = await axios.post(API_POINT_URL, pointData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    // Mocked response
-    /*
-    const response = {
-      status: 200,
-      data: {
-      id: Math.floor(Math.random() * 10000),
-      ...pointData,
-      },
-    };
-    */
     if (response.status === 201) {
       return response.data;
     } else {
