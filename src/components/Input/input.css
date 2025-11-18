@@ -1,14 +1,17 @@
 .input {
-    background-color: #000000;
-    border: 3px solid #ffffff;
+    /* Novo Estilo: Fundo claro e borda preta */
+    background-color: #F7EEDD;
+    border: 3px solid #000000;
     border-radius: 0;
     height: 50px;
-    color: #ffffff;
+    color: #2B2B24;
+    /* Texto escuro */
     padding: 10px 20px;
     width: 100%;
 }
 
 .input::placeholder {
-    color: #aaaaaa;
+    color: #6d6d6d;
+    /* Placeholder cinza escuro */
     opacity: 1;
 }

@@ -18,11 +18,12 @@ const defaultCenter = {
 export const Map = () => {
   const { token } = useAuth();
   const [markers, setMarkers] = useState([]);
-  const [newPointCoords, setNewPointCoords] = useState(null); // Coordenadas do novo ponto clicado
-  const [newPointDescription, setNewPointDescription] = useState(""); // Descrição do novo ponto
-  const [selectedMarker, setSelectedMarker] = useState(null); // Marcador selecionado para InfoWindow
+  const [newPointCoords, setNewPointCoords] = useState(null); 
+  const [newPointDescription, setNewPointDescription] = useState(""); 
+  const [newPointImage, setNewPointImage] = useState(null); // NOVO ESTADO: para o arquivo de imagem
+  const [selectedMarker, setSelectedMarker] = useState(null); 
 
-  // Substitua pela sua chave da API do Google Maps (já usa VITE_GOOGLE_MAPS_API_KEY)
+  // ... (useJsApiLoader e useEffect permanecem os mesmos)
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
@@ -39,58 +40,63 @@ export const Map = () => {
     fetchMarkers();
   }, [token]);
 
-  // Função para capturar as coordenadas ao clicar no mapa e mostrar o formulário (Tarefa 4)
+  // Função para capturar as coordenadas ao clicar no mapa e mostrar o formulário
   const handleMapClick = (event) => {
-    // Fecha qualquer InfoWindow aberta
     setSelectedMarker(null);
 
-    // Configura as coordenadas para o novo ponto
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     setNewPointCoords({ lat, lng });
-    setNewPointDescription(""); // Limpa a descrição anterior
+    setNewPointDescription("");
+    setNewPointImage(null); // Limpa a imagem anterior
   };
 
-  // Função para lidar com o clique em um marcador (para exibir a descrição) (Tarefa 4)
+  // Função para lidar com o clique em um marcador (para exibir a descrição)
   const handleMarkerClick = (marker) => {
-    // Fecha o formulário de novo ponto
     setNewPointCoords(null);
     setSelectedMarker(marker);
   };
 
-  // Função para salvar o novo ponto com a descrição (Tarefa 4)
+  // Função para salvar o novo ponto com a descrição E a imagem
   const handleSavePoint = async (e) => {
     e.preventDefault();
     if (!newPointCoords || !newPointDescription.trim()) {
       alert("A descrição é obrigatória.");
       return;
     }
-
-    const newPoint = {
-      latitude: newPointCoords.lat,
-      longitude: newPointCoords.lng,
-      descricao: newPointDescription.trim(),
-    };
-
+    
+    // Preparando os dados para envio (usando FormData para incluir o arquivo)
+    const formData = new FormData();
+    formData.append('latitude', newPointCoords.lat);
+    formData.append('longitude', newPointCoords.lng);
+    formData.append('descricao', newPointDescription.trim());
+    
+    // Adiciona o arquivo de imagem se houver
+    if (newPointImage) {
+      formData.append('image', newPointImage); // 'image' é o nome do campo esperado pelo backend
+    }
+    
     try {
-      const savedPoint = await postPoint(token, newPoint);
+        // Chamada atualizada, note que o postPoint agora precisa lidar com FormData
+        const savedPoint = await postPoint(token, formData, true); 
 
-      // Converte o ponto salvo para o formato de marcador
-      const savedMarker = {
-        id: savedPoint.id,
-        title: savedPoint.descricao || "Novo Ponto",
-        position: {
-          lat: savedPoint.latitude,
-          lng: savedPoint.longitude,
-        },
-      };
+        // O backend precisa retornar o URL da imagem salva (se aplicável)
+        const savedMarker = {
+            id: savedPoint.id,
+            title: savedPoint.descricao || "Novo Ponto",
+            position: {
+                lat: savedPoint.latitude,
+                lng: savedPoint.longitude,
+            },
+            // Supondo que o backend retorna o URL da imagem (image_url)
+            imageUrl: savedPoint.imageUrl, 
+        };
 
-      setMarkers((prev) => [...prev, savedMarker]);
+        setMarkers((prev) => [...prev, savedMarker]);
 
-      // Limpar o formulário após salvar
-      setNewPointCoords(null);
-      setNewPointDescription("");
-
+        setNewPointCoords(null);
+        setNewPointDescription("");
+        setNewPointImage(null); // Limpa o estado da imagem
     } catch (error) {
       alert(error.message);
     }
@@ -114,7 +120,7 @@ export const Map = () => {
                 key={marker.id}
                 position={marker.position}
                 title={marker.title}
-                onClick={() => handleMarkerClick(marker)} // Adicionado o handler
+                onClick={() => handleMarkerClick(marker)}
               />
             ))}
 
@@ -124,15 +130,19 @@ export const Map = () => {
                 position={selectedMarker.position}
                 onCloseClick={() => setSelectedMarker(null)}
               >
-                <div className="p-2 text-black">
+                <div className="p-2" style={{ color: '#000000', backgroundColor: '#F7EEDD', border: '2px solid #000000' }}>
                   <h3 className="font-bold text-lg mb-1">{selectedMarker.title}</h3>
-                  <p className="text-sm">Lat: {selectedMarker.position.lat.toFixed(4)}</p>
+                  {/* NOVO: Exibe a imagem se houver um URL */}
+                  {selectedMarker.imageUrl && (
+                      <img src={selectedMarker.imageUrl} alt={selectedMarker.title} style={{ maxWidth: '100px', maxHeight: '100px', marginTop: '8px', border: '1px solid #000000' }} />
+                  )}
+                  <p className="text-sm mt-2">Lat: {selectedMarker.position.lat.toFixed(4)}</p>
                   <p className="text-sm">Lng: {selectedMarker.position.lng.toFixed(4)}</p>
                 </div>
               </InfoWindow>
             )}
 
-            {/* Marcador temporário para o novo ponto (usa o ícone padrão do Google) */}
+            {/* Marcador temporário para o novo ponto */}
             {newPointCoords && (
               <Marker
                 position={newPointCoords}
@@ -146,22 +156,31 @@ export const Map = () => {
           </div>
         )}
 
-        {/* Formulário de Adicionar Ponto (Modal-like) - Estilo Blocky/Dark */}
+        {/* Formulário de Adicionar Ponto (Modal-like) - NOVO ESTILO E CAMPO DE IMAGEM */}
         {newPointCoords && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black p-6 rounded-none border-4 border-white shadow-[10px_10px_0_0_#FFFFFF] z-20 w-80">
-            <h2 className="text-xl font-bold mb-4 text-white uppercase text-center">Cadastrar Novo Ponto</h2>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#F7EEDD] p-6 rounded-none border-4 border-[#000000] shadow-[10px_10px_0_0_#A35E49] z-20 w-80 text-[#000000]">
+            <h2 className="text-xl font-bold mb-4 uppercase text-center">Cadastrar Novo Pet</h2>
             <form onSubmit={handleSavePoint}>
               <div className="mb-4">
                 <Input
                   label="Descrição"
-                  placeholder="Adicione uma descrição..."
+                  placeholder="Ex: Nome do animal, raça, etc."
                   type="text"
                   required
                   value={newPointDescription}
                   onChange={(e) => setNewPointDescription(e.target.value)}
                 />
               </div>
-              <p className="text-sm mb-4 text-white text-center">
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-1">Foto do Pet (Opcional)</label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full text-xs p-2 border-3 border-black bg-white"
+                    onChange={(e) => setNewPointImage(e.target.files[0])}
+                />
+              </div>
+              <p className="text-sm mb-4 text-center">
                 Lat: {newPointCoords.lat.toFixed(4)}, Lng: {newPointCoords.lng.toFixed(4)}
               </p>
               <div className="flex justify-between gap-4">
@@ -169,17 +188,17 @@ export const Map = () => {
                   type="button"
                   onClick={() => setNewPointCoords(null)}
                   style={{
-                    backgroundColor: '#000000',
-                    color: '#FFFFFF',
-                    border: '3px solid #FFFFFF',
-                    boxShadow: '4px 4px 0px #FFFFFF',
+                    backgroundColor: '#F7EEDD',
+                    color: '#000000',
+                    border: '3px solid #000000',
+                    boxShadow: '4px 4px 0px #A35E49',
                     flex: 1
                   }}
                 >
                   Cancelar
                 </Button>
                 <Button type="submit" style={{ flex: 1 }}>
-                  Salvar Ponto
+                  Salvar Pet
                 </Button>
               </div>
             </form>

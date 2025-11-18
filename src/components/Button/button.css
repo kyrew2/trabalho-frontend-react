@@ -1,24 +1,31 @@
 .button {
-    border-radius: 0; 
-    border: 3px solid #ffffff; 
-    color: #ffffff;
-    background-color: #000000;
+    /* Novo Estilo: Fundo de Acento (Marrom/Terracota), Borda e Sombra Pretas */
+    border-radius: 0;
+    border: 3px solid #000000;
+    color: #F7EEDD;
+    /* Texto claro/bege */
+    background-color: #A35E49;
+    /* Cor de acento: Marrom */
     padding: 12px 30px;
     text-align: center;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    /* Adicionado transição para suavizar o hover/active */
     text-transform: uppercase;
-    box-shadow: 4px 4px 0px #ffffff; /* Efeito 3D blocky */
+    box-shadow: 4px 4px 0px #000000;
+    /* Efeito 3D blocky com sombra preta */
 }
 
 .button:hover {
-    background-color: #333333; 
-    box-shadow: 2px 2px 0px #ffffff;
+    background-color: #C17C64;
+    /* Marrom mais claro no hover */
+    box-shadow: 2px 2px 0px #000000;
 }
 
 .button:active {
-    background-color: #111111;
+    background-color: #A35E49;
     box-shadow: none;
-    transform: translate(2px, 2px);
+    transform: translate(4px, 4px);
+    /* Pressiona o botão na tela */
 }

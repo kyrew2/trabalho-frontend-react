@@ -4,6 +4,8 @@ html,
 body,
 #root {
     height: 100%;
-    background-color: #000000;
-    color: #ffffff;
+    /* Novo Fundo Principal - Cinza escuro/Bege */
+    background-color: #2B2B24;
+    /* Cor do texto principal */
+    color: #F7EEDD;
 }
