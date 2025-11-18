@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Usar uma variável de ambiente para o URL base da API
+// Usar variável de ambiente para o URL base da API (Tarefa 2)
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ripe-donella-atitus-fbbf314a.koyeb.app';
-const API_POINT_URL = `${BASE_URL}/ws/point`; // Endpoint de pontos
+const API_POINT_URL = `${BASE_URL}/ws/point`;
 
 export async function getPoints(token) {
   try {
@@ -12,7 +12,6 @@ export async function getPoints(token) {
       },
     });
 
-    // o objeto response.data possui os campos latitude e longitude mas precisamos mudar os nomes para lat lng
     const points = response.data.map(point => ({
       id: point.id,
       title: point.descricao,

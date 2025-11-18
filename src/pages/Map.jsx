@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Navbar, Input, Button } from "../components"; // Adicionado Input e Button
-import { GoogleMap, Marker, useJsApiLoader, InfoWindow } from "@react-google-maps/api"; // Adicionado InfoWindow
+import { Navbar, Input, Button } from "../components";
+import { GoogleMap, Marker, useJsApiLoader, InfoWindow } from "@react-google-maps/api";
 import { getPoints, postPoint } from '../services/mapService';
 import { useAuth } from "../contexts/AuthContext";
 
@@ -10,7 +10,6 @@ const containerStyle = {
   height: "calc(100vh - 65px)",
 };
 
-// Posição inicial do mapa (São Paulo)
 const defaultCenter = {
   lat: -23.55052,
   lng: -46.633308,
@@ -40,7 +39,7 @@ export const Map = () => {
     fetchMarkers();
   }, [token]);
 
-  // 1. Função para capturar as coordenadas ao clicar no mapa e mostrar o formulário
+  // Função para capturar as coordenadas ao clicar no mapa e mostrar o formulário (Tarefa 4)
   const handleMapClick = (event) => {
     // Fecha qualquer InfoWindow aberta
     setSelectedMarker(null);
@@ -52,14 +51,14 @@ export const Map = () => {
     setNewPointDescription(""); // Limpa a descrição anterior
   };
 
-  // 2. Função para lidar com o clique em um marcador (para exibir a descrição)
+  // Função para lidar com o clique em um marcador (para exibir a descrição) (Tarefa 4)
   const handleMarkerClick = (marker) => {
     // Fecha o formulário de novo ponto
     setNewPointCoords(null);
     setSelectedMarker(marker);
   };
 
-  // 3. Função para salvar o novo ponto com a descrição
+  // Função para salvar o novo ponto com a descrição (Tarefa 4)
   const handleSavePoint = async (e) => {
     e.preventDefault();
     if (!newPointCoords || !newPointDescription.trim()) {
@@ -91,7 +90,6 @@ export const Map = () => {
       // Limpar o formulário após salvar
       setNewPointCoords(null);
       setNewPointDescription("");
-      // Opcional: alert("Ponto cadastrado com sucesso!");
 
     } catch (error) {
       alert(error.message);
@@ -101,7 +99,8 @@ export const Map = () => {
   return (
     <>
       <Navbar />
-      <div style={{ width: "100%", height: "100%" }}>
+      {/* O mapa ocupa o espaço restante */}
+      <div style={{ width: "100%", height: "calc(100vh - 65px)" }}>
         {isLoaded ? (
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -125,31 +124,32 @@ export const Map = () => {
                 position={selectedMarker.position}
                 onCloseClick={() => setSelectedMarker(null)}
               >
-                <div className="p-2">
-                  <h3 className="font-bold">{selectedMarker.title}</h3>
-                  <p>Lat: {selectedMarker.position.lat.toFixed(4)}</p>
-                  <p>Lng: {selectedMarker.position.lng.toFixed(4)}</p>
+                <div className="p-2 text-black">
+                  <h3 className="font-bold text-lg mb-1">{selectedMarker.title}</h3>
+                  <p className="text-sm">Lat: {selectedMarker.position.lat.toFixed(4)}</p>
+                  <p className="text-sm">Lng: {selectedMarker.position.lng.toFixed(4)}</p>
                 </div>
               </InfoWindow>
             )}
 
-            {/* Marcador temporário para o novo ponto */}
+            {/* Marcador temporário para o novo ponto (usa o ícone padrão do Google) */}
             {newPointCoords && (
               <Marker
                 position={newPointCoords}
-                icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
               />
             )}
 
           </GoogleMap>
         ) : (
-          <div>Carregando mapa...</div>
+          <div className="flex justify-center items-center h-full">
+            <h1 className="text-white text-2xl">Carregando mapa...</h1>
+          </div>
         )}
 
-        {/* Formulário de Adicionar Ponto (Modal-like) */}
+        {/* Formulário de Adicionar Ponto (Modal-like) - Estilo Blocky/Dark */}
         {newPointCoords && (
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-10 w-80">
-            <h2 className="text-lg font-bold mb-4">Cadastrar Novo Ponto</h2>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black p-6 rounded-none border-4 border-white shadow-[10px_10px_0_0_#FFFFFF] z-20 w-80">
+            <h2 className="text-xl font-bold mb-4 text-white uppercase text-center">Cadastrar Novo Ponto</h2>
             <form onSubmit={handleSavePoint}>
               <div className="mb-4">
                 <Input
@@ -161,18 +161,24 @@ export const Map = () => {
                   onChange={(e) => setNewPointDescription(e.target.value)}
                 />
               </div>
-              <p className="text-sm mb-4">
+              <p className="text-sm mb-4 text-white text-center">
                 Lat: {newPointCoords.lat.toFixed(4)}, Lng: {newPointCoords.lng.toFixed(4)}
               </p>
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <Button
                   type="button"
                   onClick={() => setNewPointCoords(null)}
-                  className="bg-gray-400 hover:bg-gray-500" // Tailwind para cor de botão
+                  style={{
+                    backgroundColor: '#000000',
+                    color: '#FFFFFF',
+                    border: '3px solid #FFFFFF',
+                    boxShadow: '4px 4px 0px #FFFFFF',
+                    flex: 1
+                  }}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <Button type="submit" style={{ flex: 1 }}>
                   Salvar Ponto
                 </Button>
               </div>

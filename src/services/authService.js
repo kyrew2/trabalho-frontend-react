@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Usar uma variável de ambiente para o URL base da API
+// Usar variável de ambiente para o URL base da API (Tarefa 2)
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ripe-donella-atitus-fbbf314a.koyeb.app';
-const API_URL = `${BASE_URL}/auth`; // Endpoint de autenticação
+const API_URL = `${BASE_URL}/auth`;
 
 export async function signIn(email, password) {
   try {

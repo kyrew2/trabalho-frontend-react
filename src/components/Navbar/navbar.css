@@ -1,35 +1,30 @@
 .navbar {
     align-items: center;
-    background-color: #f0f0f0;
-    /* Fundo cinza claro */
-    color: #333;
-    /* Texto escuro */
+    background-color: #000000;
+    color: #ffffff;
     display: flex;
     font-size: 18px;
-    /* Fonte um pouco maior */
     justify-content: space-between;
-    padding: 12px 24px;
-    /* Padding ajustado */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Sombra leve */
+    padding: 16px 40px;
+    border-bottom: 3px solid #ffffff;
     height: 65px;
 }
 
 .navbar .close {
-    background-color: #333;
-    /* Fundo escuro para o botão */
-    color: #fff;
-    /* Texto branco */
-    border: none;
-    border-radius: 50%;
-    /* Botão circular */
+    /* Botão de Logout com estilo blocky de acento (vermelho) */
+    background-color: #ff4d4d;
+    color: #000000;
+    border: 3px solid #ffffff;
+    border-radius: 0;
     width: 30px;
     height: 30px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s;
+    line-height: 1;
+    box-shadow: 2px 2px 0px #ffffff;
 }
 
 .navbar .close:hover {
-    background-color: #000;
+    background-color: #cc0000;
 }

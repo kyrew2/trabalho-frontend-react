@@ -1,9 +1,14 @@
 .input {
-    background-color: #ffffff;
-    border: 2px solid;
-    border-color: #000000;
-    border-radius: 10px;
-    height: 45px;
+    background-color: #000000;
+    border: 3px solid #ffffff;
+    border-radius: 0;
+    height: 50px;
+    color: #ffffff;
     padding: 10px 20px;
     width: 100%;
+}
+
+.input::placeholder {
+    color: #aaaaaa;
+    opacity: 1;
 }

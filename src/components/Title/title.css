@@ -1,4 +1,6 @@
 .title {
-    font-size: 24px;
+    font-size: 32px; /* Aumentado para destaque */
     font-weight: bold;
+    color: #ffffff;
+    text-transform: uppercase;
 }

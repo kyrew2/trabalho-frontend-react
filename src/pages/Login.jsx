@@ -25,13 +25,14 @@ export function Login() {
 
   return (
     <>
-      <div className="max-w-md mx-auto p-4">
+      {/* Container com o estilo blocky/escuro do Figma */}
+      <div className="max-w-sm mx-auto p-8 mt-10 border-4 border-white bg-black shadow-[10px_10px_0_0_#FFFFFF]">
         <div className="text-center">
           <Logo />
         </div>
 
         <div className="pt-6 pb-4">
-          <Title title="Faça seu cadastro" />
+          <Title title="FAÇA SEU LOGIN" />
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -55,19 +56,21 @@ export function Login() {
               onChange={(e) => setSenha(e.target.value)}
             />
           </div>
-          {erro && <p style={{ color: "red" }}>{erro}</p>}
+          {/* Cor de erro de alto contraste */}
+          {erro && <p style={{ color: "#ff4d4d" }} className="text-center pb-4">{erro}</p>}
 
-          <div className="text-center pt-4">
-            <Button type="submit">Acessar</Button>
+          <div className="text-center pt-8">
+            {/* O SEGREDO: type="submit" garante que o formulário seja enviado */}
+            <Button type="submit">ACESSAR</Button>
           </div>
         </form>
 
         <div className="text-center pt-8">
           <Link
             to="/register"
-            className="text-blue-600 hover:underline"
+            className="text-white hover:text-[#ff4d4d] hover:underline transition-colors duration-200"
           >
-            Faça seu cadastro
+            Ainda não tem cadastro? <strong>Crie sua conta</strong>
           </Link>
         </div>
       </div>
