@@ -1,5 +1,5 @@
 .input {
-    /* Novo Estilo: Fundo claro e borda preta */
+    /* Estilo de input do Figma: Fundo claro, Borda preta */
     background-color: #F7EEDD;
     border: 3px solid #000000;
     border-radius: 0;
@@ -12,6 +12,5 @@
 
 .input::placeholder {
     color: #6d6d6d;
-    /* Placeholder cinza escuro */
     opacity: 1;
 }

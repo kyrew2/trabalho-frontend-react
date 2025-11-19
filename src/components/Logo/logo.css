@@ -1,8 +1,8 @@
 .logo {
-  /* Novo Estilo: Fundo claro, borda preta */
+  /* Estilo de logo do Figma: Fundo claro, Borda preta */
   background-color: #F7EEDD;
   border: 4px solid #000000;
-  border-radius: 0; /* Removendo o 30 que estava incorreto */
+  border-radius: 0;
   display: inline-block;
   height: 100px;
   width: 250px;

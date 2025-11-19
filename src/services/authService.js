@@ -1,10 +1,21 @@
 import axios from 'axios';
 
-// Usar variável de ambiente para o URL base da API (Tarefa 2)
+// Usar variável de ambiente para o URL base da API
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ripe-donella-atitus-fbbf314a.koyeb.app';
 const API_URL = `${BASE_URL}/auth`;
 
+// NOVO: Flag para ativar a API de dados simulados
+const IS_MOCKING = import.meta.env.VITE_MOCK_API === 'true';
+
+// Dados simulados
+const MOCK_TOKEN = 'mock-auth-token-123';
+
 export async function signIn(email, password) {
+  if (IS_MOCKING) {
+    console.log('MOCK API: Simulating successful sign-in');
+    return new Promise((resolve) => setTimeout(() => resolve({ token: MOCK_TOKEN }), 500));
+  }
+
   try {
     const response = await axios.post(`${API_URL}/signin`, { email, password });
     return response.data;
@@ -22,6 +33,11 @@ export async function signIn(email, password) {
 }
 
 export async function signUp(name, email, password) {
+  if (IS_MOCKING) {
+    console.log('MOCK API: Simulating successful sign-up');
+    return new Promise((resolve) => setTimeout(() => resolve({ message: 'Usuário cadastrado com sucesso (MOCK).' }), 500));
+  }
+
   try {
     const response = await axios.post(`${API_URL}/signup`, { name, email, password });
     return response.data;

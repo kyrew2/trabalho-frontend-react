@@ -23,8 +23,8 @@ export function Register() {
 
     return (
         <>
-            {/* Container com o estilo blocky/escuro do Figma */}
-            <div className="max-w-sm mx-auto p-8 mt-10 border-4 border-white bg-black shadow-[10px_10px_0_0_#FFFFFF]">
+            {/* Container com o estilo blocky/vintage do Figma */}
+            <div className="max-w-sm mx-auto p-8 mt-10 border-4 border-black bg-[#F7EEDD] shadow-[10px_10px_0_0_#A35E49] text-black">
                 <div className="text-center">
                     <Logo />
                 </div>
@@ -66,15 +66,20 @@ export function Register() {
                     </div>
 
                     {/* Cor de erro de alto contraste */}
-                    {erro && <p style={{ color: "#ff4d4d" }} className="text-center pb-4">{erro}</p>}
+                    {erro && <p style={{ color: "#A35E49" }} className="text-center pb-4 font-bold">{erro}</p>}
 
                     <div className="text-center pt-8">
-                        <Button type="submit">CADASTRAR</Button>
+                        <Button
+                            type="submit"
+                            onClick={handleSubmit}
+                        >
+                            CADASTRAR
+                        </Button>
                     </div>
                 </form>
 
                 <div className="text-center pt-8">
-                    <Link to="/login" className="text-white hover:text-[#ff4d4d] hover:underline transition-colors duration-200">
+                    <Link to="/login" className="text-black hover:text-[#A35E49] hover:underline transition-colors duration-200 font-bold">
                         Já tem cadastro? <strong>Faça Login</strong>
                     </Link>
                 </div>

@@ -6,7 +6,6 @@ import { useAuth } from "../contexts/AuthContext";
 
 const containerStyle = {
   width: "100%",
-  // Altura do mapa ajustada para ocupar o espaço restante da tela, menos a altura da Navbar (65px)
   height: "calc(100vh - 65px)",
 };
 
@@ -18,12 +17,11 @@ const defaultCenter = {
 export const Map = () => {
   const { token } = useAuth();
   const [markers, setMarkers] = useState([]);
-  const [newPointCoords, setNewPointCoords] = useState(null); 
-  const [newPointDescription, setNewPointDescription] = useState(""); 
-  const [newPointImage, setNewPointImage] = useState(null); // NOVO ESTADO: para o arquivo de imagem
-  const [selectedMarker, setSelectedMarker] = useState(null); 
+  const [newPointCoords, setNewPointCoords] = useState(null);
+  const [newPointDescription, setNewPointDescription] = useState("");
+  const [newPointImage, setNewPointImage] = useState(null); // Estado para a imagem
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
-  // ... (useJsApiLoader e useEffect permanecem os mesmos)
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
@@ -40,63 +38,62 @@ export const Map = () => {
     fetchMarkers();
   }, [token]);
 
-  // Função para capturar as coordenadas ao clicar no mapa e mostrar o formulário
   const handleMapClick = (event) => {
     setSelectedMarker(null);
-
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     setNewPointCoords({ lat, lng });
     setNewPointDescription("");
-    setNewPointImage(null); // Limpa a imagem anterior
+    setNewPointImage(null); // Limpa o estado da imagem
   };
 
-  // Função para lidar com o clique em um marcador (para exibir a descrição)
   const handleMarkerClick = (marker) => {
     setNewPointCoords(null);
     setSelectedMarker(marker);
   };
 
-  // Função para salvar o novo ponto com a descrição E a imagem
   const handleSavePoint = async (e) => {
     e.preventDefault();
     if (!newPointCoords || !newPointDescription.trim()) {
       alert("A descrição é obrigatória.");
       return;
     }
-    
-    // Preparando os dados para envio (usando FormData para incluir o arquivo)
-    const formData = new FormData();
-    formData.append('latitude', newPointCoords.lat);
-    formData.append('longitude', newPointCoords.lng);
-    formData.append('descricao', newPointDescription.trim());
-    
-    // Adiciona o arquivo de imagem se houver
-    if (newPointImage) {
-      formData.append('image', newPointImage); // 'image' é o nome do campo esperado pelo backend
+
+    const isImageAttached = !!newPointImage;
+
+    let dataToSend;
+
+    // 1. Prepara os dados para envio (JSON ou FormData)
+    if (isImageAttached) {
+      dataToSend = new FormData();
+      dataToSend.append('latitude', newPointCoords.lat);
+      dataToSend.append('longitude', newPointCoords.lng);
+      dataToSend.append('descricao', newPointDescription.trim());
+      dataToSend.append('image', newPointImage);
+    } else {
+      dataToSend = {
+        latitude: newPointCoords.lat,
+        longitude: newPointCoords.lng,
+        descricao: newPointDescription.trim(),
+      };
     }
-    
+
     try {
-        // Chamada atualizada, note que o postPoint agora precisa lidar com FormData
-        const savedPoint = await postPoint(token, formData, true); 
+      const savedPoint = await postPoint(token, dataToSend, isImageAttached);
 
-        // O backend precisa retornar o URL da imagem salva (se aplicável)
-        const savedMarker = {
-            id: savedPoint.id,
-            title: savedPoint.descricao || "Novo Ponto",
-            position: {
-                lat: savedPoint.latitude,
-                lng: savedPoint.longitude,
-            },
-            // Supondo que o backend retorna o URL da imagem (image_url)
-            imageUrl: savedPoint.imageUrl, 
-        };
+      // 2. CRIAÇÃO ROBUSTA DO MARCADOR
+      const savedMarker = {
+        id: savedPoint.id,
+        title: savedPoint.descricao || newPointDescription.trim(),
+        position: newPointCoords, // Usa coordenadas locais para renderização precisa
+        imageUrl: savedPoint.imageUrl, // Usa o URL retornado (mock ou real)
+      };
 
-        setMarkers((prev) => [...prev, savedMarker]);
+      setMarkers((prev) => [...prev, savedMarker]);
 
-        setNewPointCoords(null);
-        setNewPointDescription("");
-        setNewPointImage(null); // Limpa o estado da imagem
+      setNewPointCoords(null);
+      setNewPointDescription("");
+      setNewPointImage(null);
     } catch (error) {
       alert(error.message);
     }
@@ -130,11 +127,21 @@ export const Map = () => {
                 position={selectedMarker.position}
                 onCloseClick={() => setSelectedMarker(null)}
               >
+                {/* Estilo InfoWindow ajustado para o tema */}
                 <div className="p-2" style={{ color: '#000000', backgroundColor: '#F7EEDD', border: '2px solid #000000' }}>
                   <h3 className="font-bold text-lg mb-1">{selectedMarker.title}</h3>
-                  {/* NOVO: Exibe a imagem se houver um URL */}
+                  {/* Se houver URL da imagem, tenta carregar */}
                   {selectedMarker.imageUrl && (
-                      <img src={selectedMarker.imageUrl} alt={selectedMarker.title} style={{ maxWidth: '100px', maxHeight: '100px', marginTop: '8px', border: '1px solid #000000' }} />
+                    <img
+                      src={selectedMarker.imageUrl}
+                      alt={selectedMarker.title}
+                      // Função onError para lidar com URLs quebradas (Mock ou Real)
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='40%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%23A35E49'>Sem Foto</text><rect x='10' y='10' width='80' height='80' fill='none' stroke='%23000000' stroke-width='2'/></svg>";
+                      }}
+                      style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'cover', marginTop: '8px', border: '2px solid #000000' }}
+                    />
                   )}
                   <p className="text-sm mt-2">Lat: {selectedMarker.position.lat.toFixed(4)}</p>
                   <p className="text-sm">Lng: {selectedMarker.position.lng.toFixed(4)}</p>
@@ -156,7 +163,7 @@ export const Map = () => {
           </div>
         )}
 
-        {/* Formulário de Adicionar Ponto (Modal-like) - NOVO ESTILO E CAMPO DE IMAGEM */}
+        {/* Formulário de Adicionar Ponto (Modal-like) - Estilo Vintage Dark/Blocky */}
         {newPointCoords && (
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#F7EEDD] p-6 rounded-none border-4 border-[#000000] shadow-[10px_10px_0_0_#A35E49] z-20 w-80 text-[#000000]">
             <h2 className="text-xl font-bold mb-4 uppercase text-center">Cadastrar Novo Pet</h2>
@@ -171,15 +178,38 @@ export const Map = () => {
                   onChange={(e) => setNewPointDescription(e.target.value)}
                 />
               </div>
+
+              {/* CAMPO DE FOTO CUSTOMIZADO */}
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-1">Foto do Pet (Opcional)</label>
+
+                {/* 1. INPUT DE ARQUIVO REAL (ESCONDIDO) */}
                 <input
-                    type="file"
-                    accept="image/*"
-                    className="w-full text-xs p-2 border-3 border-black bg-white"
-                    onChange={(e) => setNewPointImage(e.target.files[0])}
+                  id="pet-file-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => setNewPointImage(e.target.files[0])}
                 />
+
+                {/* 2. LABEL CUSTOMIZADO ESTILIZADO COMO INPUT */}
+                <label
+                  htmlFor="pet-file-upload"
+                  className="w-full text-base cursor-pointer px-4 py-2 block"
+                  style={{
+                    backgroundColor: '#F7EEDD',
+                    border: '3px solid #000000',
+                    color: newPointImage ? '#000000' : '#6d6d6d',
+                    minHeight: '50px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  {newPointImage ? newPointImage.name : "Escolher arquivo..."}
+                </label>
+
               </div>
+
               <p className="text-sm mb-4 text-center">
                 Lat: {newPointCoords.lat.toFixed(4)}, Lng: {newPointCoords.lng.toFixed(4)}
               </p>
@@ -195,10 +225,10 @@ export const Map = () => {
                     flex: 1
                   }}
                 >
-                  Cancelar
+                  CANCELAR
                 </Button>
                 <Button type="submit" style={{ flex: 1 }}>
-                  Salvar Pet
+                  SALVAR PET
                 </Button>
               </div>
             </form>

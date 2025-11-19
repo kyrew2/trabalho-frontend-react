@@ -4,8 +4,8 @@ html,
 body,
 #root {
     height: 100%;
-    /* Novo Fundo Principal - Cinza escuro/Bege */
+    /* Fundo Principal: Cinza Escuro/Bege */
     background-color: #2B2B24;
-    /* Cor do texto principal */
+    /* Texto Principal: Bege Claro */
     color: #F7EEDD;
 }
