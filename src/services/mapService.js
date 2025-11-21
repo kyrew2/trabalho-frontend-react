@@ -70,7 +70,10 @@ export async function getPoints(token) {
       throw new Error('Erro ao buscar pontos');
     }
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Erro ao buscar pontos');
+    console.error('getPoints error:', error.response || error);
+    const serverMsg = error.response?.data?.message || error.response?.data?.error || (typeof error.response?.data === 'string' ? error.response.data : JSON.stringify(error.response?.data || {}));
+    const status = error.response?.status;
+    throw new Error(serverMsg ? `${serverMsg} (status ${status})` : 'Erro ao buscar pontos');
   }
 }
 
@@ -103,6 +106,9 @@ export async function postPoint(token, pointData, isFormData = false) {
     if (response.status === 201) return response.data;
     else throw new Error('Erro ao cadastrar ponto');
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Erro ao cadastrar ponto');
+    console.error('postPoint error:', error.response || error);
+    const serverMsg = error.response?.data?.message || error.response?.data?.error || (typeof error.response?.data === 'string' ? error.response.data : JSON.stringify(error.response?.data || {}));
+    const status = error.response?.status;
+    throw new Error(serverMsg ? `${serverMsg} (status ${status})` : 'Erro ao cadastrar ponto');
   }
 }
