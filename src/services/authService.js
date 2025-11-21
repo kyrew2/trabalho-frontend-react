@@ -1,5 +1,5 @@
 import axios from 'axios';
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ripe-donella-atitus-fbbf314a.koyeb.app';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://classical-carmita-kyrew2-c254198e.koyeb.app';
 const API_URL = `${BASE_URL}/auth`;
 const IS_MOCKING = import.meta.env.VITE_MOCK_API === 'true';
 const MOCK_TOKEN = 'mock-auth-token-123';
